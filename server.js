@@ -77,7 +77,7 @@ client.on("ready", (message) => {
   
   // このBOTチャンネルIDは `世界征服#ひろゆき`
   const botChannelId = "1167436853549477948"
-  sendMsg(botChannelId, "おきたぞあ")
+  sendMsg(botChannelId, "おきたぞ")
 });
 
 /*
@@ -109,7 +109,7 @@ function sendReply(message, text) {
 
 function sendMsg(channelId, text, option = {}) {
   client.channels
-    .get(channelId)
+    .resolveId(channelId)
     .send(text, option)
     .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
     .catch(console.error);
