@@ -5,6 +5,14 @@ const Routes = discord.Routes;
 const Client = discord.Client;
 const GatewayIntentBits = discord.GatewayIntentBits;
 
+const isDebug = true;
+function loggingForDebug(msg)
+{
+  if (isDebug) {
+    console.log(msg)
+  }
+}
+
 // TOKENなかったら即死する
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
   console.log("DISCORD_BOT_TOKENが設定されていません。");
@@ -85,6 +93,10 @@ client.on("ready", (message) => {
  * 会話の内容を入力する場合はこっち
  */
 client.on("message", (message) => {
+  loggingForDebug("message.author.id: " + message.author.id)
+  loggingForDebug("client.user.id: " + message.author.bot)
+  loggingForDebug("message.content: " + message.content)
+  
   // BOTがwatchしているチャンネルでアクションされたときの処理
   if (message.author.id == client.user.id || message.author.bot) {
     return;
@@ -109,7 +121,8 @@ function sendReply(message, text) {
 
 function sendMsg(channelId, text, option = {}) {
   client.channels
-    .resolveId(channelId)
+    .cache
+    .get(channelId)
     .send(text, option)
     .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
     .catch(console.error);
