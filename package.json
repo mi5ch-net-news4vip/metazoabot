@@ -16,7 +16,7 @@
     "querystring": "^0.2.0"
   },
   "engines": {
-    "node": "12.x"
+    "node": "16.14.2"
   },
   "repository": {
     "url": "https://glitch.com/edit/#!/metazoabot"
