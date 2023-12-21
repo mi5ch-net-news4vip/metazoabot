@@ -16,6 +16,7 @@
     "querystring": "^0.2.0"
   },
   "engines": {
+    "//1": "this node version is stable version for glitch.com",
     "node": "16.14.2"
   },
   "repository": {

@@ -1,4 +1,4 @@
-const discord = require('discord.js');
+const discord = require("discord.js");
 
 const REST = discord.REST;
 const Routes = discord.Routes;
@@ -6,9 +6,9 @@ const Client = discord.Client;
 const GatewayIntentBits = discord.GatewayIntentBits;
 
 // TOKENなかったら即死する
-if(process.env.DISCORD_BOT_TOKEN == undefined){
- console.log('DISCORD_BOT_TOKENが設定されていません。');
- process.exit(0);
+if (process.env.DISCORD_BOT_TOKEN == undefined) {
+  console.log("DISCORD_BOT_TOKENが設定されていません。");
+  process.exit(0);
 }
 
 /*
@@ -27,8 +27,8 @@ if(process.env.DISCORD_BOT_TOKEN == undefined){
  */
 const commands = [
   {
-    name: 'ping',
-    description: 'Replies with Pong!',
+    name: "ping",
+    description: "Replies with Pong!",
   },
 ];
 
@@ -53,57 +53,64 @@ const commands = [
  */
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.on('ready', () => {
+client.on("ready", () => {
   // BOTがdiscordにログインしたときの処理
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-client.on('interactionCreate', async interaction => {
+client.on("interactionCreate", async (interaction) => {
   // BOTがなんかしらのコマンドなどを受領したときの処理
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === 'ping') {
-    await interaction.reply('Pong!');
+  if (interaction.commandName === "ping") {
+    await interaction.reply("Pong!");
   }
 });
 
 // ログイン実施
 client.login(process.env.DISCORD_BOT_TOKEN);
 
-client.on('ready', message =>{
+client.on("ready", (message) => {
   // BOTの待ち受け開始
-  console.log('Bot準備完了～');
-  client.user.setPresence({ activity: { name: 'げーむ' } });
+  console.log("Bot準備完了～");
+  client.user.setPresence({ activity: { name: "げーむ" } });
+  
+  // このBOTチャンネルIDは `世界征服#ひろゆき`
+  const botChannelId = "1167436853549477948"
+  sendMsg(botChannelId, "おきたぞあ")
 });
 
 /*
  * BOTとの会話の定義
  * 会話の内容を入力する場合はこっち
  */
-client.on('message', message =>{
+client.on("message", (message) => {
   // BOTがwatchしているチャンネルでアクションされたときの処理
-  if (message.author.id == client.user.id || message.author.bot){
+  if (message.author.id == client.user.id || message.author.bot) {
     return;
   }
-  if(message.isMemberMentioned(client.user)){
+  if (message.isMemberMentioned(client.user)) {
     sendReply(message, "呼びましたか？");
     return;
   }
-  if (message.content.match(/にゃ～ん|にゃーん/)){
+  if (message.content.match(/にゃ～ん|にゃーん/)) {
     let text = "にゃ～ん";
     sendMsg(message.channel.id, text);
     return;
   }
 });
 
-function sendReply(message, text){
-  message.reply(text)
+function sendReply(message, text) {
+  message
+    .reply(text)
     .then(console.log("リプライ送信: " + text))
     .catch(console.error);
 }
 
-function sendMsg(channelId, text, option={}){
-  client.channels.get(channelId).send(text, option)
+function sendMsg(channelId, text, option = {}) {
+  client.channels
+    .get(channelId)
+    .send(text, option)
     .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
     .catch(console.error);
 }
