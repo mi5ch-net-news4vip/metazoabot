@@ -1,41 +1,87 @@
-const http = require('http');
-const querystring = require('querystring');
 const discord = require('discord.js');
-const client = new discord.Client();
 
-http.createServer(function(req, res){
-  if (req.method == 'POST'){
-    var data = "";
-    req.on('data', function(chunk){
-      data += chunk;
-    });
-    req.on('end', function(){
-      if(!data){
-        res.end("No post data");
-        return;
-      }
-      var dataObject = querystring.parse(data);
-      console.log("post:" + dataObject.type);
-      if(dataObject.type == "wake"){
-        console.log("Woke up in post");
-        res.end();
-        return;
-      }
-      res.end();
-    });
+const REST = discord.REST;
+const Routes = discord.Routes;
+const Client = discord.Client;
+const GatewayIntentBits = discord.GatewayIntentBits;
+
+// TOKENなかったら即死する
+if(process.env.DISCORD_BOT_TOKEN == undefined){
+ console.log('DISCORD_BOT_TOKENが設定されていません。');
+ process.exit(0);
+}
+
+/*
+ * コマンド登録
+ * いわゆるスラッシュコマンド (/から開始するコマンド) を登録することが可能
+ */
+
+/**
+ * @typedef Command
+ * @property name {string} コマンド名
+ * @property description {string} コマンド詳細
+ */
+
+/**
+ * @type commands {Command[]} 受付可能コマンドリスト
+ */
+const commands = [
+  {
+    name: 'ping',
+    description: 'Replies with Pong!',
+  },
+];
+
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
+
+(async () => {
+  try {
+    console.log('Started refreshing application (/) commands.');
+
+    // ここで実際に設定したコマンドを登録している
+    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+
+    console.log('Successfully reloaded application (/) commands.');
+  } catch (error) {
+    console.error(error);
   }
-  else if (req.method == 'GET'){
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end('Discord Bot is active now\n');
+})();
+
+/*
+ * BOT起動
+ * BOTの起動時処理などはこっち
+ */
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+
+client.on('ready', () => {
+  // BOTがdiscordにログインしたときの処理
+  console.log(`Logged in as ${client.user.tag}!`);
+});
+
+client.on('interactionCreate', async interaction => {
+  // BOTがなんかしらのコマンドなどを受領したときの処理
+  if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === 'ping') {
+    await interaction.reply('Pong!');
   }
-}).listen(3000);
+});
+
+// ログイン実施
+client.login(process.env.DISCORD_BOT_TOKEN);
 
 client.on('ready', message =>{
+  // BOTの待ち受け開始
   console.log('Bot準備完了～');
   client.user.setPresence({ activity: { name: 'げーむ' } });
 });
 
+/*
+ * BOTとの会話の定義
+ * 会話の内容を入力する場合はこっち
+ */
 client.on('message', message =>{
+  // BOTがwatchしているチャンネルでアクションされたときの処理
   if (message.author.id == client.user.id || message.author.bot){
     return;
   }
@@ -49,13 +95,6 @@ client.on('message', message =>{
     return;
   }
 });
-
-if(process.env.DISCORD_BOT_TOKEN == undefined){
- console.log('DISCORD_BOT_TOKENが設定されていません。');
- process.exit(0);
-}
-
-client.login( process.env.DISCORD_BOT_TOKEN );
 
 function sendReply(message, text){
   message.reply(text)
