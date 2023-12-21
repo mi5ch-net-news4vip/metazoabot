@@ -61,11 +61,6 @@ const commands = [
  */
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
-client.on("ready", () => {
-  // BOTがdiscordにログインしたときの処理
-  console.log(`Logged in as ${client.user.tag}!`);
-});
-
 client.on("interactionCreate", async (interaction) => {
   // BOTがなんかしらのコマンドなどを受領したときの処理
   if (!interaction.isChatInputCommand()) return;
@@ -75,18 +70,6 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-// ログイン実施
-client.login(process.env.DISCORD_BOT_TOKEN);
-
-client.on("ready", (message) => {
-  // BOTの待ち受け開始
-  console.log("Bot準備完了～");
-  client.user.setPresence({ activity: { name: "げーむ" } });
-  
-  // このBOTチャンネルIDは `世界征服#ひろゆき`
-  const botChannelId = "1167436853549477948"
-  sendMsg(botChannelId, "おきたぞ")
-});
 
 /*
  * BOTとの会話の定義
@@ -127,3 +110,17 @@ function sendMsg(channelId, text, option = {}) {
     .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
     .catch(console.error);
 }
+
+
+// ログイン実施
+client.login(process.env.DISCORD_BOT_TOKEN);
+
+client.on("ready", (message) => {
+  // BOTの待ち受け開始
+  console.log("Bot準備完了～");
+  client.user.setPresence({ activity: { name: "げーむ" } });
+  
+  // このBOTチャンネルIDは `世界征服#ひろゆき`
+  const botChannelId = "1167436853549477948"
+  sendMsg(botChannelId, "おきたぞ")
+});
