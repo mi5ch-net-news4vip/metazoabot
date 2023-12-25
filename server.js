@@ -122,5 +122,5 @@ client.on("ready", (message) => {
   
   // このBOTチャンネルIDは `世界征服#ひろゆき`
   const botChannelId = "1167436853549477948"
-  sendMsg(botChannelId, "おきたぞ")
+  sendMsg(botChannelId, "諸説ある")
 });
