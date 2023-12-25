@@ -36,7 +36,7 @@ if (process.env.DISCORD_BOT_TOKEN == undefined) {
 const commands = [
   {
     name: "ping",
-    description: "Replies with Pong!",
+    description: "Replies with ( ◞‸◟ )",
   },
   {
     name: "pregnant",
@@ -70,7 +70,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === "ping") {
-    await interaction.reply("Pong!");
+    await interaction.reply("( ◞‸◟ )");
   }
   if (interaction.commandName === "pregnant") {
     await interaction.reply("子宮なでなでしたい");
