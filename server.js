@@ -1,4 +1,7 @@
 const discord = require("discord.js");
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
+require('dotenv').config();
 
 const REST = discord.REST;
 const Routes = discord.Routes;
@@ -9,7 +12,14 @@ const isDebug = true;
 function loggingForDebug(msg)
 {
   if (isDebug) {
-    console.log(msg)
+    if (msg instanceof Object) {
+      for (let key in msg) {
+        console.log(key + ": " + msg[key])
+      }
+      console.log(msg)
+    } else {
+      console.log(msg)
+    }
   }
 }
 
@@ -19,10 +29,26 @@ if (process.env.DISCORD_BOT_TOKEN == undefined) {
   process.exit(0);
 }
 
+const channelIds = {
+  anon: "1066721871560712255",  // 匿名お嬢様
+}
+
+const commandKeys = { 
+  ping: "ping",
+  pregnant: "pregnant",
+  anon: "anon",
+}
+
 /*
  * コマンド登録
  * いわゆるスラッシュコマンド (/から開始するコマンド) を登録することが可能
  */
+
+// 匿名書き込み用コマンド
+const builder = new SlashCommandBuilder()
+const anonCommand = builder.setName(commandKeys.anon)
+  .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
+  .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
 
 /**
  * @typedef Command
@@ -35,13 +61,14 @@ if (process.env.DISCORD_BOT_TOKEN == undefined) {
  */
 const commands = [
   {
-    name: "ping",
+    name: commandKeys.ping,
     description: "Replies with ( ◞‸◟ )",
   },
   {
-    name: "pregnant",
+    name: commandKeys.pregnant,
     description: "Replies with 子宮なでなでしたい",
   },
+  anonCommand,
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
@@ -63,17 +90,24 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN)
  * BOT起動
  * BOTの起動時処理などはこっち
  */
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: GatewayIntentBits.Guilds });
 
 client.on("interactionCreate", async (interaction) => {
   // BOTがなんかしらのコマンドなどを受領したときの処理
   if (!interaction.isChatInputCommand()) return;
 
-  if (interaction.commandName === "ping") {
+  if (interaction.commandName === commandKeys.ping) {
     await interaction.reply("( ◞‸◟ )");
   }
-  if (interaction.commandName === "pregnant") {
+  if (interaction.commandName === commandKeys.pregnant) {
     await interaction.reply("子宮なでなでしたい");
+  }
+  if (interaction.commandName === commandKeys.anon) {
+    console.log("匿名お嬢様 channnelId: " + channelIds.anon)
+    const ch = client.channels.cache.get(channelIds.anon)
+    console.log("interaction.options: " + interaction.options)
+    loggingForDebug(interaction.options)
+    await ch.send(interaction.options.getString("message", true))
   }
 });
 
