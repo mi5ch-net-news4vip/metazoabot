@@ -35,7 +35,7 @@ const channelIds = {
 
 const commandKeys = { 
   ping: "ping",
-  pregnant: "pregnant",
+  pregnant: "cervix",
   anon: "anon",
 }
 
