@@ -25,11 +25,11 @@
 4. `npm install` をします
     1. `npm i`
 5. `.env` を作成し、次のような内容を入力します
-    - ```.env
+    ```.env
     DISCORD_BOT_TOKEN = XXXXXXXXXXXXXXXXXXX
     CLIENT_ID = XXXXXXXXXXXXXXXXXXX
     ```
-    - 入力する内容はそれぞれ、 `discord developer portal` より取得できます
+    > 入力する内容はそれぞれ、 `discord developer portal` より取得できます
 5. botを起動させます
     1. `npm run start`
 
