@@ -13,6 +13,8 @@ pids
 
 # Env
 .env
+.env.yml
+.env.yaml
 
 # Dist
 dist
