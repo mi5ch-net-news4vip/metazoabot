@@ -6,15 +6,21 @@
   "author": "gunvip",
   "version": "0.0.1",
   "description": "A simple Node app built on Express, instantly up and running.",
-  "main": "server.js",
+  "main": "src/server.ts",
   "scripts": {
-    "start": "node server.js"
+    "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
+    "dev": "nodemon ./src/server.ts"
   },
   "dependencies": {
     "@discordjs/builders": "^1.7.0",
     "discord.js": "^14.14.1",
+    "dotenv-yaml": "^0.1.4",
+    "env-yaml": "^0.1.2",
     "express": "^4.17.1",
-    "querystring": "^0.2.0"
+    "js-yaml": "^4.1.0",
+    "nodemon": "^3.0.2",
+    "querystring": "^0.2.0",
+    "ts-node": "^10.9.2"
   },
   "engines": {
     "//1": "this node version is stable version for glitch.com",
@@ -30,6 +36,9 @@
     "express"
   ],
   "devDependencies": {
-    "dotenv": "^16.3.1"
+    "@types/js-yaml": "^4.0.9",
+    "dotenv": "^16.3.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
   }
 }
