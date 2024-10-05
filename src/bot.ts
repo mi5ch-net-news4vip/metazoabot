@@ -2,6 +2,14 @@ import discord from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import CreateDebugger from '@src/util/debug';
 
+<<<<<<< Updated upstream
+=======
+import { Command } from '@src/command/commandBase';
+import commands from '@src/command/body';
+import commandRouting from '@src/command/route';
+import * as serverListRepo from '@src/repository/serverList';
+
+>>>>>>> Stashed changes
 import dotenv from 'dotenv'
 dotenv.config();
 
@@ -35,7 +43,7 @@ export function bootBot() {
   /**
    * コマンドのキー
    */
-  const commandKeys = { 
+  const commandKeys = {
     /**
      * pingコマンド
      */
@@ -50,7 +58,7 @@ export function bootBot() {
     anon: "anon",
   }
 
-  /*
+  /**
    * コマンド登録
    * いわゆるスラッシュコマンド (/から開始するコマンド) を登録することが可能
    */
@@ -58,35 +66,12 @@ export function bootBot() {
   // 匿名書き込み用コマンド
   const builder = new SlashCommandBuilder()
   const anonCommand = builder.setName(commandKeys.anon)
-  .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
-  .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
+    .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
+    .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
 
 
-  /**
-   * @type Command
-   * @property name {string} コマンド名
-   * @property description {string} コマンド詳細
-   */
-  type Command = {
-    name: string,
-    description: string,
-  }
 
-  /**
-   * @type commands {Command[]} 受付可能コマンドリスト
-   */
-  const commands: Command[] = [
-    {
-      name: commandKeys.ping,
-      description: "Replies with ( ◞‸◟ )",
-    },
-    {
-      name: commandKeys.pregnant,
-      description: "Replies with 子宮なでなでしたい",
-    },
-    anonCommand,
-  ];
-
+  // discord rest api client instance
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_SECRET_TOKEN);
 
   (async () => {
@@ -109,6 +94,9 @@ export function bootBot() {
   const client = new Client({ intents: GatewayIntentBits.Guilds });
 
   client.on("interactionCreate", async (interaction) => {
+
+    commandRouting(interaction);
+
     // BOTがなんかしらのコマンドなどを受領したときの処理
     if (!interaction.isChatInputCommand()) return;
 
@@ -165,15 +153,15 @@ export function bootBot() {
 
   async function sendReply(message: discord.Message, text: string) {
     await message.reply(text)
-    .then(() => dbgr.log("リプライ送信: " + text))
-    .catch((err: Error) => dbgr.log(err));
+      .then(() => dbgr.log("リプライ送信: " + text))
+      .catch((err: Error) => dbgr.log(err));
   }
 
   async function sendMsg(message: discord.Message, text: string) {
     await message.channel
-    .send(text)
-    .then(() => dbgr.log("メッセージ送信: " + text))
-    .catch((err: Error) => dbgr.log(err));
+      .send(text)
+      .then(() => dbgr.log("メッセージ送信: " + text))
+      .catch((err: Error) => dbgr.log(err));
   }
 
 
@@ -194,11 +182,11 @@ export function bootBot() {
 
     // このBOTチャンネルIDは `世界征服#ひろゆき`
     client.channels
-    .fetch(channelIds.log)
-    .then((channel) => {
-      const ch = channel as AnyChannel
-      ch.send("諸説ある");
-    })
+      .fetch(channelIds.log)
+      .then((channel) => {
+        const ch = channel as AnyChannel
+        ch.send("諸説ある");
+      })
   });
 
 }
