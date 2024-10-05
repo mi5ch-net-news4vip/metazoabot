@@ -2,14 +2,11 @@ import discord from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import CreateDebugger from '@src/util/debug';
 
-<<<<<<< Updated upstream
-=======
 import { Command } from '@src/command/commandBase';
 import commands from '@src/command/body';
 import commandRouting from '@src/command/route';
 import * as serverListRepo from '@src/repository/serverList';
 
->>>>>>> Stashed changes
 import dotenv from 'dotenv'
 dotenv.config();
 
