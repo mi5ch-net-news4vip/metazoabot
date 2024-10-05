@@ -2,6 +2,8 @@ import discord from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import CreateDebugger from '@src/util/debug';
 
+import * as serverListRepo from '@src/repository/serverList';
+
 import dotenv from 'dotenv'
 dotenv.config();
 
