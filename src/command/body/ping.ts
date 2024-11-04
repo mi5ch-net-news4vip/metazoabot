@@ -1,4 +1,4 @@
-import { Command } from '../commandBase';
+import { Command } from '@cmd/define';
 
 const ping: Command = {
   meta: {

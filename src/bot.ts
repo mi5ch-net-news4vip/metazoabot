@@ -1,22 +1,18 @@
 import discord from "discord.js";
-import { SlashCommandBuilder } from '@discordjs/builders';
+
+import commandRouting from '@src/command/route';
+import getClientInstance from '@src/bot/client';
 import CreateDebugger from '@src/util/debug';
 
-import { Command } from '@src/command/commandBase';
-import commands from '@src/command/body';
-import commandRouting from '@src/command/route';
-import * as serverListRepo from '@src/repository/serverList';
+import { getCommandList } from '@src/command/body';
 
 import dotenv from 'dotenv'
 dotenv.config();
 
 const REST = discord.REST;
 const Routes = discord.Routes;
-const Client = discord.Client;
-const GatewayIntentBits = discord.GatewayIntentBits;
 
-const isDebug = true;
-const dbgr = CreateDebugger(isDebug);
+const dbgr = CreateDebugger();
 
 type AnyChannel = (discord.DMChannel | discord.PartialDMChannel | discord.NewsChannel | discord.StageChannel | discord.TextChannel | discord.PrivateThreadChannel | discord.PublicThreadChannel<any> | discord.VoiceChannel)
 
@@ -28,45 +24,9 @@ export function bootBot() {
   }
 
   /**
-   * チャンネルID全般ラッパー
-   */
-  const channelIds = {
-    // このBOTチャンネルIDは `世界征服#匿名めたぞあ`
-    anon: process.env.DISCORD_CHANNEL_ANON ?? "",
-    // このBOTチャンネルIDは `世界征服#ひろゆき`
-    log: process.env.DISCORD_CHANNEL_LOG ?? "",
-  }
-
-  /**
    * コマンドのキー
    */
-  const commandKeys = {
-    /**
-     * pingコマンド
-     */
-    ping: "ping",
-    /**
-     * 子宮なでなでコマンド
-     */
-    pregnant: "cervix",
-    /**
-     * 匿名めたぞあ発言コマンド
-     */
-    anon: "anon",
-  }
-
-  /**
-   * コマンド登録
-   * いわゆるスラッシュコマンド (/から開始するコマンド) を登録することが可能
-   */
-
-  // 匿名書き込み用コマンド
-  const builder = new SlashCommandBuilder()
-  const anonCommand = builder.setName(commandKeys.anon)
-    .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
-    .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
-
-
+  const commandKeys = getCommandList()
 
   // discord rest api client instance
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_SECRET_TOKEN);
@@ -76,7 +36,7 @@ export function bootBot() {
       dbgr.log('Started refreshing application (/) commands.');
 
       // ここで実際に設定したコマンドを登録している
-      await rest.put(Routes.applicationCommands(process.env.DISCORD_BOT_SECRET_CLIENT ?? ""), { body: commands });
+      await rest.put(Routes.applicationCommands(process.env.DISCORD_BOT_SECRET_CLIENT ?? ""), { body: getCommandList() });
 
       dbgr.log('Successfully reloaded application (/) commands.');
     } catch (error) {
@@ -88,103 +48,38 @@ export function bootBot() {
    * BOT起動
    * BOTの起動時処理などはこっち
    */
-  const client = new Client({ intents: GatewayIntentBits.Guilds });
+  const client = getClientInstance();
 
-  client.on("interactionCreate", async (interaction) => {
+  client.on("interactionCreate", commandRouting);
+  //client.on("interactionCreate", async (interaction) => {
 
-    commandRouting(interaction);
+  //  commandRouting(interaction);
 
-    // BOTがなんかしらのコマンドなどを受領したときの処理
-    if (!interaction.isChatInputCommand()) return;
+  //  // BOTがなんかしらのコマンドなどを受領したときの処理
+  //  if (!interaction.isChatInputCommand()) return;
 
-    if (interaction.commandName === commandKeys.ping) {
-      await interaction.reply("( ◞‸◟ )");
-    }
-    if (interaction.commandName === commandKeys.pregnant) {
-      await interaction.reply("子宮なでなでしたい");
-    }
-    if (interaction.commandName === commandKeys.anon) {
-      dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
-      const ch = client.channels.cache.get(channelIds.anon)
-      if (ch === undefined) {
-        dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
-        await interaction.reply("壁に話しかけさせようとするな💢\nchannel-id: " + channelIds.anon);
-        return;
-      }
-      dbgr.log("interaction.options: " + interaction.options)
-      dbgr.log(interaction.options)
-      //await ch.send(interaction.options.getString("message", true))
-      await interaction?.channel?.send(interaction.options.getString("message", true))
-    }
-  });
-
-
-  /*
-   * BOTとの会話の定義
-   * 会話の内容を入力する場合はこっち
-   */
-  client.on("message", (message) => {
-    dbgr.log("message.author.id: " + message.author.id)
-    dbgr.log("client.user.id: " + message.author.bot)
-    dbgr.log("message.content: " + message.content)
-
-    if (client.user === null || client.user === undefined) {
-      sendReply(message, `お前誰だよ💢 (client.userが ${typeof client.user} )\n`);
-      return;
-    }
-
-    // BOTがwatchしているチャンネルでアクションされたときの処理
-    if (message.author.id == client.user.id || message.author.bot) {
-      return;
-    }
-    if (message.isMemberMentioned(client.user)) {
-      sendReply(message, "呼びましたか？");
-      return;
-    }
-    if (message.content.match(/にゃ～ん|にゃーん/)) {
-      let text = "にゃ～ん";
-      sendMsg(message, text);
-      return;
-    }
-  });
-
-  async function sendReply(message: discord.Message, text: string) {
-    await message.reply(text)
-      .then(() => dbgr.log("リプライ送信: " + text))
-      .catch((err: Error) => dbgr.log(err));
-  }
-
-  async function sendMsg(message: discord.Message, text: string) {
-    await message.channel
-      .send(text)
-      .then(() => dbgr.log("メッセージ送信: " + text))
-      .catch((err: Error) => dbgr.log(err));
-  }
-
+  //  if (interaction.commandName === commandKeys.ping) {
+  //    await interaction.reply("( ◞‸◟ )");
+  //  }
+  //  if (interaction.commandName === commandKeys.pregnant) {
+  //    await interaction.reply("子宮なでなでしたい");
+  //  }
+  //  if (interaction.commandName === commandKeys.anon) {
+  //    dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
+  //    const ch = client.channels.cache.get(channelIds.anon)
+  //    if (ch === undefined) {
+  //      dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
+  //      await interaction.reply("壁に話しかけさせようとするな💢\nchannel-id: " + channelIds.anon);
+  //      return;
+  //    }
+  //    dbgr.log("interaction.options: " + interaction.options)
+  //    dbgr.log(interaction.options)
+  //    //await ch.send(interaction.options.getString("message", true))
+  //    await interaction?.channel?.send(interaction.options.getString("message", true))
+  //  }
+  //});
 
   // ログイン実施
-  client.login(process.env.DISCORD_BOT_SECRET_TOKEN);
-
-  client.on("ready", (cl: discord.Client<boolean>) => {
-    // BOTの待ち受け開始
-    dbgr.log("Bot準備完了～");
-    cl.user?.setPresence({
-      activities: [
-        {
-          name: "げーむ",
-          state: "ぴゅっぴゅ中"
-        },
-      ],
-    });
-
-    // このBOTチャンネルIDは `世界征服#ひろゆき`
-    client.channels
-      .fetch(channelIds.log)
-      .then((channel) => {
-        const ch = channel as AnyChannel
-        ch.send("諸説ある");
-      })
-  });
-
+  client.login(process?.env?.DISCORD_BOT_SECRET_TOKEN);
 }
 

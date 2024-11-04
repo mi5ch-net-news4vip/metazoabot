@@ -2,9 +2,9 @@ type Debugger = {
   isDebug: boolean;
   log: (msg: any) => void;
 }
-var thiz: Debugger|null = null
+var thiz: Debugger | null = null
 
-function createDebuggerInstance(isDebug: boolean): Debugger {
+function createDebuggerInstance(isDebug = false): Debugger {
   if (thiz === null) {
     thiz = {
       isDebug: isDebug,

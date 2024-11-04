@@ -1,6 +1,6 @@
 import { Interaction } from "discord.js";
 
-import { Command } from "./commandBase";
+import { Command } from "@cmd/define";
 import cl from "./body";
 
 /**
@@ -17,6 +17,7 @@ async function interactionCreate(interaction: Interaction) {
   const commandList = cl as Command[];
 
   const found = commandList.find(c => c.meta.name == interaction.commandName);
+
   if (found) {
     found.handler(interaction)
   }
