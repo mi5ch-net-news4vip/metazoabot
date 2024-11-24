@@ -35,7 +35,7 @@ export function bootBot() {
   /**
    * コマンドのキー
    */
-  const commandKeys = { 
+  const commandKeys = {
     /**
      * pingコマンド
      */
@@ -58,8 +58,8 @@ export function bootBot() {
   // 匿名書き込み用コマンド
   const builder = new SlashCommandBuilder()
   const anonCommand = builder.setName(commandKeys.anon)
-  .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
-  .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
+    .setDescription("(匿名お嬢様の代わり) あなたに代わってめたぞあがつぶやきます")
+    .addStringOption(option => option.setName("message").setDescription("メッセージ").setRequired(true))
 
 
   /**
@@ -113,23 +113,28 @@ export function bootBot() {
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === commandKeys.ping) {
+      console.log("CMD: ping")
       await interaction.reply("( ◞‸◟ )");
     }
     if (interaction.commandName === commandKeys.pregnant) {
+      console.log("CMD: pregnant")
       await interaction.reply("子宮なでなでしたい");
     }
     if (interaction.commandName === commandKeys.anon) {
-      dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
-      const ch = client.channels.cache.get(channelIds.anon)
+      console.log("CMD: anon")
+      console.log("匿名お嬢様 channnelId: " + channelIds.anon)
+      const ch = client.channels.cache.get(channelIds.anon) as discord.TextChannel
       if (ch === undefined) {
         dbgr.log("匿名お嬢様 channnelId: " + channelIds.anon)
         await interaction.reply("壁に話しかけさせようとするな💢\nchannel-id: " + channelIds.anon);
         return;
       }
       dbgr.log("interaction.options: " + interaction.options)
-      dbgr.log(interaction.options)
-      //await ch.send(interaction.options.getString("message", true))
-      await interaction?.channel?.send(interaction.options.getString("message", true))
+      console.dir(interaction.options, { depth: null })
+      console.log("channel")
+      console.dir(ch, { depth: null })
+      await ch.send(interaction.options.getString("message", true))
+      //await interaction?.channel?.send(interaction.options.getString("message", true))
     }
   });
 
@@ -165,15 +170,15 @@ export function bootBot() {
 
   async function sendReply(message: discord.Message, text: string) {
     await message.reply(text)
-    .then(() => dbgr.log("リプライ送信: " + text))
-    .catch((err: Error) => dbgr.log(err));
+      .then(() => dbgr.log("リプライ送信: " + text))
+      .catch((err: Error) => dbgr.log(err));
   }
 
   async function sendMsg(message: discord.Message, text: string) {
     await message.channel
-    .send(text)
-    .then(() => dbgr.log("メッセージ送信: " + text))
-    .catch((err: Error) => dbgr.log(err));
+      .send(text)
+      .then(() => dbgr.log("メッセージ送信: " + text))
+      .catch((err: Error) => dbgr.log(err));
   }
 
 
@@ -194,11 +199,11 @@ export function bootBot() {
 
     // このBOTチャンネルIDは `世界征服#ひろゆき`
     client.channels
-    .fetch(channelIds.log)
-    .then((channel) => {
-      const ch = channel as AnyChannel
-      ch.send("諸説ある");
-    })
+      .fetch(channelIds.log)
+      .then((channel) => {
+        const ch = channel as AnyChannel
+        ch.send("諸説ある");
+      })
   });
 
 }
