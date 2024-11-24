@@ -9,7 +9,21 @@
   "main": "src/server.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register ./src/server.ts",
-    "dev": "nodemon ./src/server.ts"
+    "dev": "nodemon src/server.ts"
+  },
+  "nodemonConfig": {
+    "ignore":
+    [
+      "**/*.test.ts",
+      "**/*.spec.ts",
+      ".git",
+      "node_modules"
+    ],
+    "watch": [
+      "src"
+    ],
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/server.ts",
+    "ext": "ts, js"
   },
   "dependencies": {
     "@discordjs/builders": "^1.7.0",
